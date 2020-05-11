@@ -1,0 +1,88 @@
+scalar Date
+union scalars = Int | Float | String | Boolean
+directive @default( value: scalars! ) on FIELD_DEFINITION
+
+directive @unique on FIELD_DEFINITION
+directive @index on FIELD_DEFINITION
+directive @foreignKey( value: String! ) on FIELD_DEFINITION
+
+interface IName {
+    name: String
+}
+
+interface INode {
+    content: String
+    handle: String @unique @index
+    title: String
+    description: String
+}
+
+interface IKeyValuePair {
+    name: String @unique
+    value: String
+}
+
+interface ITemplate {
+    template_suffix: String
+}
+
+
+type Persons {
+    first_name: String!
+    last_name: String!
+    phone: String
+    email: String
+}
+
+type Roles implements IName {
+    name: String
+}
+
+type Users{
+    username: String!
+    password: String!
+
+    belongsTo: Persons
+    associateTo: Roles
+}
+
+type Blogs implements IName & INode{
+    name: String
+    content: String
+    handle: String @unique @index
+    title: String
+    description: String
+
+    comments_enabled: Boolean! @default(value: true)
+    moderated: Boolean! @default(value: true)
+}
+
+type Images {
+    alt: String
+    attached_to_variant: Boolean! @default(value: false)
+    src: String!
+    height: Int
+    width: Int
+}
+
+type Tags implements IName{
+    name: String! @unique
+}
+
+type Articles implements IName & INode {
+    name: String
+    content: String
+    handle: String @unique @index
+    title: String
+    description: String
+
+    excerpt: String
+    author: String!
+    moderated: Boolean
+    published_at: Date
+
+    belongsTo: Users
+    associateTo: Blogs
+    hasAndBelongsToMany: Images
+    hasAndBelongsToMany1: Tags
+}

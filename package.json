@@ -1,0 +1,37 @@
+{
+  "name": "@komino/graphql-sqlite-ddl",
+  "version": "0.0.3",
+  "description": "Parse graphQL Types to SQLite DDL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/digi3colin/graphql-sqlite-ddl.git"
+  },
+  "keywords": [
+    "GraphQL",
+    "SQLite",
+    "DDL",
+    "Javascript",
+    "Schema",
+    "Tool",
+    "ORM",
+    "database"
+  ],
+  "author": "Shiba Komino",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/digi3colin/graphql-sqlite-ddl/issues"
+  },
+  "homepage": "https://github.com/digi3colin/graphql-sqlite-ddl#readme",
+  "dependencies": {
+    "graphql": "^15.0.0",
+    "pluralize": "^8.0.0",
+    "snake-case": "^3.0.3"
+  },
+  "devDependencies": {
+    "jest": "^26.0.1"
+  }
+}
