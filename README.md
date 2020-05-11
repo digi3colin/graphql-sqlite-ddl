@@ -19,13 +19,13 @@ const sql = parse(schema);
 result will be
 ```
 CREATE TABLE persons(
-id INTEGER UNIQUE DEFAULT ((( strftime('%s','now') - 1563741060 ) * 100000) + (RANDOM() & 65535)) NOT NULL ,
-created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
-updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
-first_name TEXT NOT NULL ,
-last_name TEXT NOT NULL ,
-phone TEXT ,
-email TEXT
+    id INTEGER UNIQUE DEFAULT ((( strftime('%s','now') - 1563741060 ) * 100000) + (RANDOM() & 65535)) NOT NULL ,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+    first_name TEXT NOT NULL ,
+    last_name TEXT NOT NULL ,
+    phone TEXT ,
+    email TEXT
 );
 
 CREATE TRIGGER persons_updated_at AFTER UPDATE ON persons WHEN old.updated_at < CURRENT_TIMESTAMP BEGIN
