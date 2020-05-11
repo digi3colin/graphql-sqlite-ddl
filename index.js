@@ -115,6 +115,8 @@ END;`
 
     let isUnique = false;
     let indexString = "";
+    let isPrimary = false;
+    let isAutoIncrement = false;
     field.directives.map( directive => {
       switch( directive.name.value ){
         case "default":
@@ -128,6 +130,12 @@ END;`
           // check directive contains UNIQUE
           indexString = `idx_${table}_${name} ON ${table} (${name});`
           break;
+        case "primary":
+          isPrimary = true;
+          break;
+        case "autoIncrement":
+          isAutoIncrement = true;
+          break;
       }
     });
 
@@ -138,8 +146,12 @@ END;`
     const isNonNull = (field.type.kind === "NonNullType");
 
     lines.push(
-      `${name} ${SCALAR[fieldType]}${(opts.length>0)?" ": ""}${opts.join(" ")}${isNonNull ? " NOT NULL" : ""}`
+      `${name} ${SCALAR[fieldType]}${(opts.length>0)?" ": ""}${opts.join(" ")}${isNonNull ? " NOT NULL" : ""}${isAutoIncrement ? " AUTO_INCREMENT" : ""}`
     )
+
+    if(isPrimary) {
+      lines.push(`PRIMARY KEY (${name})`);
+    }
   });
 
   const belongs_many  = ((belongsManys.length > 0) ? "\n" : "")  + belongsManys.join('\n');
@@ -190,5 +202,8 @@ directive @default( value: scalars! ) on FIELD_DEFINITION
 directive @unique on FIELD_DEFINITION
 directive @index on FIELD_DEFINITION
 directive @foreignKey( value: String! ) on FIELD_DEFINITION
+directive @primary on FIELD_DEFINITION
+directive @autoIncrement on FIELD_DEFINITION
+
 `
 }

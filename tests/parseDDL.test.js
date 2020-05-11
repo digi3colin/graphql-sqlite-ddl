@@ -325,4 +325,42 @@ CREATE TABLE article_tags(
     expect(sql).toBe(target);
   })
 
+  test('primary key', ()=>{
+    const schema = buildSchema(schemaHeader + `
+type Persons {
+    id: Int! @primary
+    name: String
+}`);
+
+    const sql = parse(schema, false);
+    const target = `
+CREATE TABLE persons(
+    id INTEGER NOT NULL ,
+    PRIMARY KEY (id) ,
+    name TEXT
+);
+`
+
+    expect(sql).toBe(target);
+
+  })
+
+  test('auto increment', ()=>{
+    const schema = buildSchema(schemaHeader + `
+type Persons {
+    id: Int! @primary @autoIncrement
+    name: String
+}`);
+
+    const sql = parse(schema, false);
+    const target = `
+CREATE TABLE persons(
+    id INTEGER NOT NULL AUTO_INCREMENT ,
+    PRIMARY KEY (id) ,
+    name TEXT
+);
+`
+
+    expect(sql).toBe(target);
+  })
 });

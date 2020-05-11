@@ -1,6 +1,6 @@
 {
   "name": "@komino/graphql-sqlite-ddl",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Parse graphQL Types to SQLite DDL",
   "main": "index.js",
   "scripts": {
