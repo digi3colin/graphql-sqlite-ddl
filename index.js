@@ -10,23 +10,20 @@ const SCALAR = {
 }
 
 function getFieldType(type){
-  switch (type.kind){
-    case "NonNullType":
-      return type.type.name.value;
-    case "NamedType":
-      return type.name.value
-    default:
-      throw new Error('undefined type')
-  }
+  return (type.kind === "NonNullType") ?
+      type.type.name.value :
+      type.name.value;
 }
 
-function getDefaultValue(value){
-  switch(typeof value){
-    case "boolean":
+function getDefaultValue(value, type){
+  switch(type){
+    case 'Boolean':
       return value ? "TRUE" : "FALSE";
-    case "string":
+    case 'String':
       return `"${value}"`;
-    default :
+    case 'Int':
+    case 'Float':
+    default:
       return value;
   }
 }
@@ -51,7 +48,6 @@ END;`
   }
 
   const belongsManys = [];
-  const uniqueIndices = [];
   const indices = [];
 
   //read fields
@@ -60,10 +56,13 @@ END;`
     //first_name TEXT NOT NULL
     //price REAL DEFAULT 0 NOT NULL
     const name = field.name.value;
+    const fieldType = getFieldType(field.type);
+
     if(useDefaultModel && /^(id|created_at|updated_at)$/.test(name)){
       return;
     }
 
+    //parse belongsTo / associateTo
     const isBelongs = /^belongsTo/.test(name);
     const isAssoicateTo = /^associateTo/.test(name);
     if( isBelongs || isAssoicateTo){
@@ -72,8 +71,10 @@ END;`
 
       //check custom foreign key rather than model_id
       field.directives.forEach( directive => {
-        if(directive.name.value === "key"){
-          fk = directive.arguments[0].value.value + '_id';
+        switch (directive.name.value) {
+          case "foreignKey":
+            fk = directive.arguments[0].value.value;
+            break;
         }
       });
 
@@ -99,13 +100,13 @@ END;`
       const fkA = `${pluralize.singular(modelA)}_id`;
       const fkB = `${pluralize.singular(modelB)}_id`;
 
-      belongsManys.push(`
-CREATE TABLE ${jointTableName}(
-${fkA} INTEGER NOT NULL,
-${fkB} INTEGER NOT NULL,
-weight REAL, 
-FOREIGN KEY (${fkA}) REFERENCES ${modelA} (id) ON DELETE CASCADE ,
-FOREIGN KEY (${fkB}) REFERENCES ${modelB} (id) ON DELETE CASCADE
+      belongsManys.push(
+`CREATE TABLE ${jointTableName}(
+    ${fkA} INTEGER NOT NULL ,
+    ${fkB} INTEGER NOT NULL ,
+    weight REAL ,
+    FOREIGN KEY (${fkA}) REFERENCES ${modelA} (id) ON DELETE CASCADE ,
+    FOREIGN KEY (${fkB}) REFERENCES ${modelB} (id) ON DELETE CASCADE
 );`)
       return;
     }
@@ -117,7 +118,7 @@ FOREIGN KEY (${fkB}) REFERENCES ${modelB} (id) ON DELETE CASCADE
     field.directives.map( directive => {
       switch( directive.name.value ){
         case "default":
-          opts.push('DEFAULT ' + getDefaultValue(directive.arguments[0].value.value));
+          opts.push('DEFAULT ' + getDefaultValue(directive.arguments[0].value.value, fieldType));
           break;
         case "unique":
           isUnique = true;
@@ -134,7 +135,6 @@ FOREIGN KEY (${fkB}) REFERENCES ${modelB} (id) ON DELETE CASCADE
       indices.push( (isUnique ? "CREATE UNIQUE INDEX " : "CREATE INDEX ") + indexString)
     }
 
-    const fieldType = getFieldType(field.type);
     const isNonNull = (field.type.kind === "NonNullType");
 
     lines.push(
@@ -144,12 +144,11 @@ FOREIGN KEY (${fkB}) REFERENCES ${modelB} (id) ON DELETE CASCADE
 
   const belongs_many  = ((belongsManys.length > 0) ? "\n" : "")  + belongsManys.join('\n');
   const indexes       = ((indices.length > 0) ? "\n" : "")       + indices.join('\n');
-  const uniqueIndexes = ((uniqueIndices.length > 0) ? "\n" : "") + uniqueIndices.join('\n');
 
   return `
 CREATE TABLE ${table}(
     ${lines.concat(onDeletes).join(' ,\n    ')}
-);${updateTrigger}${belongs_many}${indexes}${uniqueIndexes}
+);${updateTrigger}${belongs_many}${indexes}
 `;
 }
 
@@ -164,18 +163,8 @@ function getTypeMap(schema){
     if(/^(Int|Float|String|Boolean|ID)$/.test(key))return;
 
     const type = types[key]['astNode'];
-
-    switch(type['kind']){
-      case "ObjectTypeDefinition":
-        typeMap.set(key, type);
-        break;
-      case "ScalarTypeDefinition":
-      case "InterfaceTypeDefinition":
-      case "UnionTypeDefinition":
-        break;
-      default:
-        console.log(type['kind'])
-        throw new Error('unknown type')
+    if(type['kind'] === "ObjectTypeDefinition"){
+      typeMap.set(key, type);
     }
   });
 
