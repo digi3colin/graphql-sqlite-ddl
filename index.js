@@ -207,6 +207,9 @@ function insert(data){
 }
 
 module.exports = {
+  getFieldType : getFieldType,
+  getDefaultValue: getDefaultValue,
+  getTypeMap: getTypeMap,
   parse: parse,
   uid: () => ( ( (Date.now() - 1563741060000) / 1000 ) | 0 ) * 100000 + ((Math.random()*100000) & 65535),
   insert: insert,

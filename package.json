@@ -1,10 +1,11 @@
 {
   "name": "@komino/graphql-sqlite-ddl",
-  "version": "0.0.8",
+  "version": "0.0.10",
   "description": "Parse graphQL Types to SQLite DDL",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel ./index.js -d umd"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,10 @@
     "snake-case": "^3.0.3"
   },
   "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/plugin-transform-modules-umd": "^7.9.0",
+    "@babel/preset-env": "^7.9.6",
     "jest": "^26.0.1"
   }
 }

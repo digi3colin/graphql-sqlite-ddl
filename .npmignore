@@ -2,3 +2,5 @@
 tests
 node_modules
 coverage
+umd/node_modules
+umd/coverage
