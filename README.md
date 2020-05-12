@@ -33,12 +33,16 @@ CREATE TRIGGER persons_updated_at AFTER UPDATE ON persons WHEN old.updated_at < 
 END;
 ```
 
+##
+
 ### Supported Directives
 - default(value: "")
 - unique
 - index
 - primary
 - autoIncrement
+
+##
 
 ### ORM
 belongsTo, hasAndBelongsToMany

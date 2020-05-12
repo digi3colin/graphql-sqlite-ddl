@@ -192,8 +192,24 @@ function parse(schema, useDefaultModel = true){
   return sqls.join('\n');
 }
 
+function insert(data){
+  const lines = [];
+
+  data.forEach((x, k) => {
+    const table = snakeCase(k);
+    const keys = Object.keys(x[0]);
+    lines.push(
+      `INSERT INTO ${table} (${keys.join(', ')}) VALUES ${ x.map( y => `(${Object.keys(y).map(z => `'${String(y[z]).replace(/'/g, "''")}'`).join(', ')})`).join(',\n')};`
+    );
+  });
+
+  return lines.join('\n');
+}
+
 module.exports = {
   parse: parse,
+  uid: () => ( ( (Date.now() - 1563741060000) / 1000 ) | 0 ) * 100000 + ((Math.random()*100000) & 65535),
+  insert: insert,
   schemaHeader : `
 scalar Date
 union scalars = Int | Float | String | Boolean
@@ -204,6 +220,5 @@ directive @index on FIELD_DEFINITION
 directive @foreignKey( value: String! ) on FIELD_DEFINITION
 directive @primary on FIELD_DEFINITION
 directive @autoIncrement on FIELD_DEFINITION
-
 `
 }
