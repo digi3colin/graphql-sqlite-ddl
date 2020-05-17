@@ -9,6 +9,8 @@ const SCALAR = {
   Date    : 'DATETIME'
 }
 
+pluralize.addPluralRule('person', 'persons');
+
 function getFieldType(type){
   return (type.kind === "NonNullType") ?
       type.type.name.value :
@@ -29,7 +31,7 @@ function getDefaultValue(value, type){
 }
 
 function parseType(type, useDefaultModel) {
-  const table = snakeCase(type.name.value);
+  const table = snakeCase(pluralize(type.name.value));
   const lines = [];
   const onDeletes = [];
 
@@ -95,7 +97,7 @@ END;`
 
     if(/^hasAndBelongsToMany/.test(name)){
       const modelA = table;
-      const modelB = snakeCase(field.type.name.value);
+      const modelB = snakeCase(pluralize(field.type.name.value));
       const jointTableName = pluralize.singular(modelA) + '_' + modelB;
       const fkA = `${pluralize.singular(modelA)}_id`;
       const fkB = `${pluralize.singular(modelB)}_id`;
@@ -196,7 +198,7 @@ function insert(data){
   const lines = [];
 
   data.forEach((x, k) => {
-    const table = snakeCase(k);
+    const table = snakeCase(pluralize(k));
     const keys = Object.keys(x[0]);
     lines.push(
       `INSERT INTO ${table} (${keys.join(', ')}) VALUES ${ x.map( y => `(${Object.keys(y).map(z => `'${String(y[z]).replace(/'/g, "''")}'`).join(', ')})`).join(',\n')};`

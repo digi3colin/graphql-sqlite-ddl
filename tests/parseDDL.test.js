@@ -362,5 +362,24 @@ CREATE TABLE persons(
 `
 
     expect(sql).toBe(target);
+  });
+
+  test('schema is singluar', ()=>{
+    const schema = buildSchema(schemaHeader + `
+type Person {
+    id: Int! @primary @autoIncrement
+    name: String
+}`);
+
+    const sql = parse(schema, false);
+    const target = `
+CREATE TABLE persons(
+    id INTEGER NOT NULL AUTO_INCREMENT ,
+    PRIMARY KEY (id) ,
+    name TEXT
+);
+`
+
+    expect(sql).toBe(target);
   })
 });
