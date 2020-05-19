@@ -382,4 +382,21 @@ CREATE TABLE persons(
 
     expect(sql).toBe(target);
   })
+
+  test('json type', () => {
+    const schema = buildSchema(schemaHeader + `
+type Person {
+  meta: JSON
+  name: String
+}`)
+    const sql = parse(schema, false);
+    const target = `
+CREATE TABLE persons(
+    meta JSON ,
+    name TEXT
+);
+`
+
+    expect(sql).toBe(target);
+  })
 });

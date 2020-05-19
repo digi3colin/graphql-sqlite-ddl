@@ -6,7 +6,8 @@ const SCALAR = {
   Float   : 'REAL',
   String  : 'TEXT',
   Boolean : 'BOOLEAN',
-  Date    : 'DATETIME'
+  Date    : 'DATETIME',
+  JSON    : 'JSON',
 }
 
 pluralize.addPluralRule('person', 'persons');
@@ -25,6 +26,7 @@ function getDefaultValue(value, type){
       return `"${value}"`;
     case 'Int':
     case 'Float':
+    case 'JSON':
     default:
       return value;
   }
@@ -217,6 +219,7 @@ module.exports = {
   insert: insert,
   schemaHeader : `
 scalar Date
+scalar JSON
 union scalars = Int | Float | String | Boolean
 directive @default( value: scalars! ) on FIELD_DEFINITION
 
