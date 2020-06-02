@@ -90,8 +90,8 @@ END;`
 
       onDeletes.push(
         isBelongs ?
-          `FOREIGN KEY (${fk}) REFERENCES ${model} (id) ON DELETE CASCADE`:
-          `FOREIGN KEY (${fk}) REFERENCES ${model} (id) ON DELETE SET NULL`
+          `FOREIGN KEY (${fk}) REFERENCES ${pluralize(model)} (id) ON DELETE CASCADE`:
+          `FOREIGN KEY (${fk}) REFERENCES ${pluralize(model)} (id) ON DELETE SET NULL`
       )
       return;
     }
@@ -109,8 +109,8 @@ END;`
     ${fkA} INTEGER NOT NULL ,
     ${fkB} INTEGER NOT NULL ,
     weight REAL ,
-    FOREIGN KEY (${fkA}) REFERENCES ${modelA} (id) ON DELETE CASCADE ,
-    FOREIGN KEY (${fkB}) REFERENCES ${modelB} (id) ON DELETE CASCADE
+    FOREIGN KEY (${fkA}) REFERENCES ${pluralize(modelA)} (id) ON DELETE CASCADE ,
+    FOREIGN KEY (${fkB}) REFERENCES ${pluralize(modelB)} (id) ON DELETE CASCADE
 );`)
       return;
     }

@@ -399,4 +399,43 @@ CREATE TABLE persons(
 
     expect(sql).toBe(target);
   })
+
+  test('belongsTo singular type name', () => {
+    const schema = buildSchema(schemaHeader + `
+type User{
+    name: String
+}
+
+type Blog{
+    handle: String 
+    belongsTo: User
+}
+`);
+    const sql = parse(schema);
+    const target = `
+CREATE TABLE users(
+    id INTEGER UNIQUE DEFAULT ((( strftime('%s','now') - 1563741060 ) * 100000) + (RANDOM() & 65535)) NOT NULL ,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+    name TEXT
+);
+CREATE TRIGGER users_updated_at AFTER UPDATE ON users WHEN old.updated_at < CURRENT_TIMESTAMP BEGIN
+    UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = old.id;
+END;
+
+
+CREATE TABLE blogs(
+    id INTEGER UNIQUE DEFAULT ((( strftime('%s','now') - 1563741060 ) * 100000) + (RANDOM() & 65535)) NOT NULL ,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL ,
+    handle TEXT ,
+    user_id INTEGER NOT NULL ,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+CREATE TRIGGER blogs_updated_at AFTER UPDATE ON blogs WHEN old.updated_at < CURRENT_TIMESTAMP BEGIN
+    UPDATE blogs SET updated_at = CURRENT_TIMESTAMP WHERE id = old.id;
+END;
+`
+    expect(sql).toBe(target);
+  })
 });
